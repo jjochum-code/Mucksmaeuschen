@@ -8,7 +8,6 @@
   var cfg = MM.config;
   var STAGES = cfg.STAGES;
   var PHASES = cfg.PHASES;
-  var METER_RANGE = cfg.METER_RANGE;
 
   // ---------- DOM ----------
   function $(id) {
@@ -41,15 +40,19 @@
   var mode = 'idle';
   var phase = loadPhase();
   var currentStage = -1;
-  /** Live-Verschiebung der Phasen-Schwellen per Schieberegler (dB, + = lockerer). */
-  var offset = loadOffset(phase);
+  /** Position des Schiebereglers = Grenze zu „Zu laut!“ in dB über dem Grundpegel. */
+  var red = loadRed(phase);
 
   var mic = new MM.MicLevel();
   var tracker = new MM.loudness.LoudnessTracker(-60);
 
-  /** Wirksame Schwellen = Phase + Schieberegler. */
+  /**
+   * Wirksame Schwellen: Die rote Grenze kommt vom Schieberegler, die beiden
+   * unteren Grenzen wachsen/schrumpfen im gleichen Verhältnis wie in der Phase.
+   */
   function thresholds() {
-    return phase.thresholds.map(function (t) { return t + offset; });
+    var scale = red / phase.thresholds[2];
+    return phase.thresholds.map(function (t) { return Math.round(t * scale * 10) / 10; });
   }
 
   // ---------- Persistenz (nur Komfort, darf fehlschlagen) ----------
@@ -72,22 +75,16 @@
     return findPhase(store('mm.phase')) || findPhase(cfg.DEFAULT_PHASE_ID) || PHASES[0];
   }
 
-  function loadOffset(p) {
-    var v = Number(store('mm.offset.' + p.id));
-    return Number.isFinite(v) ? clampOffset(v, p) : 0;
+  function loadRed(p) {
+    var stored = store('mm.red.' + p.id);
+    var v = stored === null ? NaN : Number(stored);
+    return Number.isFinite(v) ? clampRed(v) : p.thresholds[2];
   }
 
-  /** Erlaubter Bereich des Schiebereglers für eine Phase. */
-  function offsetBounds(p) {
-    return {
-      lo: Math.max(-cfg.SENSITIVITY_LIMIT, cfg.MIN_FIRST_THRESHOLD - p.thresholds[0]),
-      hi: cfg.SENSITIVITY_LIMIT,
-    };
-  }
-
-  function clampOffset(v, p) {
-    var b = offsetBounds(p || phase);
-    return Math.max(b.lo, Math.min(b.hi, Math.round(v * 2) / 2));
+  /** Der Regler darf über die ganze Höhe des Pegelmessers – keine weiteren Sperren. */
+  function clampRed(v) {
+    var r = cfg.METER_RANGE;
+    return Math.max(r.min, Math.min(r.max, Math.round(v * 2) / 2));
   }
 
   // ---------- Aufbau ----------
@@ -116,18 +113,16 @@
 
   /** dB über Grundpegel → Höhe im Pegelmesser in % (0 = unten). */
   function toPercent(relDb) {
-    var pct = ((relDb - METER_RANGE.min) / (METER_RANGE.max - METER_RANGE.min)) * 100;
+    var r = cfg.METER_RANGE;
+    var pct = ((relDb - r.min) / (r.max - r.min)) * 100;
     return Math.max(0, Math.min(100, pct));
-  }
-
-  function fromPercent(pct) {
-    return METER_RANGE.min + (pct / 100) * (METER_RANGE.max - METER_RANGE.min);
   }
 
   /** Farbzonen und Regler-Position an die wirksamen Schwellen anpassen. */
   function buildZones() {
     var th = thresholds();
-    var bounds = [METER_RANGE.min].concat(th, [METER_RANGE.max]);
+    var range = cfg.METER_RANGE;
+    var bounds = [range.min].concat(th, [range.max]);
     var gradient = STAGES.map(function (s, i) {
       return s.color + ' ' + toPercent(bounds[i]) + '% ' + toPercent(bounds[i + 1]) + '%';
     }).join(', ');
@@ -135,67 +130,68 @@
     zonesDim.style.background = bg;
     zonesLit.style.background = bg;
 
-    var red = th[2];
-    var b = offsetBounds(phase);
+    var isDefault = red === phase.thresholds[2];
     sensHandle.style.setProperty('--pos', String(toPercent(red) / 100));
-    sensHandle.setAttribute('aria-valuemin', String(phase.thresholds[2] + b.lo));
-    sensHandle.setAttribute('aria-valuemax', String(phase.thresholds[2] + b.hi));
+    sensHandle.setAttribute('aria-valuemin', String(range.min));
+    sensHandle.setAttribute('aria-valuemax', String(range.max));
     sensHandle.setAttribute('aria-valuenow', String(red));
     sensHandle.setAttribute(
       'aria-valuetext',
-      offset === 0 ? 'Standard' : offset > 0 ? offset + ' dB lockerer' : -offset + ' dB strenger'
+      'Grenze bei ' + red + ' dB' + (isDefault ? ' (Standard)' : ', Standard ' + phase.thresholds[2] + ' dB')
     );
-    sensReset.hidden = offset === 0;
+    // Platz bleibt reserviert, damit der Pegelmesser beim Ein-/Ausblenden nicht springt
+    sensReset.style.visibility = isDefault ? 'hidden' : 'visible';
   }
 
-  function setOffset(v) {
-    var next = clampOffset(v);
-    if (next === offset) return;
-    offset = next;
-    store('mm.offset.' + phase.id, String(offset));
+  function setRed(v) {
+    var next = clampRed(v);
+    if (next === red) return;
+    red = next;
+    store('mm.red.' + phase.id, String(red));
     buildZones();
   }
   buildZones();
 
   // ---------- Schieberegler: Grenze „Zu laut!“ live verschieben ----------
-  // Ziehen am Griff oder Tippen irgendwo auf den Pegelmesser setzt die Grenze dorthin;
-  // die beiden unteren Grenzen wandern im gleichen Abstand mit.
-  var dragging = false;
+  // Der Griff lässt sich über die ganze Höhe ziehen (ganz unten = sehr streng,
+  // ganz oben = sehr locker). Er bewegt sich relativ zur Greifposition, springt also nicht.
+  var drag = null; // { y: Start-Y, red: Startwert, dbPerPx }
 
-  function offsetFromPointer(clientY) {
-    var r = meterBar.getBoundingClientRect();
-    var pct = ((r.bottom - clientY) / r.height) * 100;
-    return fromPercent(pct) - phase.thresholds[2];
-  }
-
-  meter.addEventListener('pointerdown', function (e) {
+  sensHandle.addEventListener('pointerdown', function (e) {
     if (mode === 'manual') return;
-    dragging = true;
-    meter.setPointerCapture(e.pointerId);
+    e.preventDefault();
+    var barHeight = meterBar.getBoundingClientRect().height;
+    drag = {
+      y: e.clientY,
+      red: red,
+      dbPerPx: (cfg.METER_RANGE.max - cfg.METER_RANGE.min) / barHeight,
+    };
+    sensHandle.setPointerCapture(e.pointerId);
     meter.classList.add('dragging');
     sensHandle.focus({ preventScroll: true });
-    setOffset(offsetFromPointer(e.clientY));
   });
-  meter.addEventListener('pointermove', function (e) {
-    if (dragging) setOffset(offsetFromPointer(e.clientY));
+  sensHandle.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    setRed(drag.red + (drag.y - e.clientY) * drag.dbPerPx);
   });
   function endDrag() {
-    dragging = false;
+    drag = null;
     meter.classList.remove('dragging');
   }
-  meter.addEventListener('pointerup', endDrag);
-  meter.addEventListener('pointercancel', endDrag);
+  sensHandle.addEventListener('pointerup', endDrag);
+  sensHandle.addEventListener('pointercancel', endDrag);
 
   var KEY_STEPS = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 5, PageDown: -5 };
   sensHandle.addEventListener('keydown', function (e) {
-    if (e.key in KEY_STEPS) setOffset(offset + KEY_STEPS[e.key]);
-    else if (e.key === 'Home' || e.key === 'Escape') setOffset(0);
+    if (e.key in KEY_STEPS) setRed(red + KEY_STEPS[e.key]);
+    else if (e.key === 'Home' || e.key === 'Escape') setRed(phase.thresholds[2]);
+    else if (e.key === 'End') setRed(cfg.METER_RANGE.max);
     else return;
     e.preventDefault();
   });
 
   sensReset.addEventListener('click', function () {
-    setOffset(0);
+    setRed(phase.thresholds[2]);
   });
 
   // ---------- Anzeige ----------
@@ -235,7 +231,7 @@
     if (debugEl.hidden || t - lastDebugT < 150) return;
     lastDebugT = t;
     var th = thresholds();
-    var shift = offset ? ' (' + (offset > 0 ? '+' : '') + offset + ')' : '';
+    var shift = red !== phase.thresholds[2] ? ' (Regler)' : '';
     var pending =
       st.pendingStage !== st.stage
         ? ' → ' + (st.pendingStage + 1) + ' (' + Math.round(st.pendingProgress * 100) + ' %)'
@@ -334,7 +330,7 @@
   phaseSelect.addEventListener('change', function () {
     phase = findPhase(phaseSelect.value) || phase;
     store('mm.phase', phase.id);
-    offset = loadOffset(phase);
+    red = loadRed(phase);
     buildZones();
     if (mode === 'live') {
       statusEl.textContent = statusEl.textContent.replace(/Phase: .*/, 'Phase: ' + phase.label);

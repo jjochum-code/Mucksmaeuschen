@@ -32,14 +32,11 @@ MM.config = {
 
   DEFAULT_PHASE_ID: 'unterricht',
 
-  /** Anzeigebereich des Pegelmessers in dB relativ zum Grundpegel. */
-  METER_RANGE: { min: -3, max: 40 },
-
-  /** Wie weit der Schieberegler die Schwellen einer Phase verschieben darf (dB). */
-  SENSITIVITY_LIMIT: 12,
-
-  /** Die unterste Grenze bleibt mindestens so weit über dem Grundpegel – sonst gäbe es kein Grün mehr. */
-  MIN_FIRST_THRESHOLD: 3,
+  /**
+   * Anzeigebereich des Pegelmessers in dB über dem Grundpegel.
+   * Der Schieberegler (Grenze „Zu laut!“) kann sich über diesen ganzen Bereich bewegen.
+   */
+  METER_RANGE: { min: 0, max: 40 },
 
   /** Dauer der Grundpegel-Messung (ms). */
   CALIBRATION_MS: 4000,

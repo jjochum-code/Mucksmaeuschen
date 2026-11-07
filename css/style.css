@@ -159,7 +159,7 @@ select:focus-visible,
 /* Ampel + Pegelmesser nebeneinander */
 .stage-row {
   /* Höhe von Ampel und Pegelmesser; bei niedrigen Fenstern Platz für Kopfzeile + Legende lassen */
-  --h: min(58vmin, 520px, calc(100dvh - 290px));
+  --h: clamp(180px, min(58vmin, calc(100dvh - 290px)), 520px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -172,7 +172,8 @@ select:focus-visible,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  /* Platz, damit der Griff an den Enden die Beschriftung nicht verdeckt */
+  gap: 14px;
 }
 
 .meter-cap {
@@ -192,8 +193,6 @@ select:focus-visible,
   padding: calc(var(--grip) / 2) 0;
   display: flex;
   justify-content: center;
-  cursor: ns-resize;
-  touch-action: none;
   user-select: none;
 }
 
@@ -235,6 +234,7 @@ select:focus-visible,
   border: 3px solid #1d2327;
   box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
   cursor: grab;
+  touch-action: none;
   transition: bottom 0.12s ease-out;
 }
 

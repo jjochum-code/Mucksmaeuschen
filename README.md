@@ -9,9 +9,10 @@ Die Lautstärke wird **nur lokal** im Browser ausgewertet – nichts wird aufgez
 - 4 Farbstufen: Mucksmäuschenstill · Leise · Etwas laut · Zu laut!
 - Glättung + Verzögerung (Stufe steigt erst nach 1,5 s, fällt nach 1,2 s)
 - Phasen Stillarbeit / Unterricht / Gruppenarbeit mit eigenen Schwellen
-- Vertikaler Pegelmesser neben der Ampel mit Schieberegler: Die Grenze zu „Zu laut!“
-  lässt sich live verschieben (ziehen, antippen oder Pfeiltasten), die anderen Grenzen
-  wandern mit; wird je Phase gemerkt
+- Vertikaler Pegelmesser neben der Ampel mit Schieberegler: Der Griff markiert die
+  Grenze zu „Zu laut!“ und lässt sich über die ganze Höhe (0–40 dB über Grundpegel)
+  ziehen oder per Pfeiltasten verschieben; die Grenzen zu „Leise“ und „Etwas laut“
+  wachsen im gleichen Verhältnis mit. Wird je Phase gemerkt.
 - Handbetrieb ohne Mikrofon (Stufe antippen oder Tasten 1–4), Vollbild, Bildschirm bleibt an
 
 ## Aufbau
