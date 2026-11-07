@@ -30,6 +30,22 @@
         "seegras"
       ],
       "beschreibung": "Schwimmt herbei, wenn es ruhig ist"
+    },
+    {
+      "id": "krebs",
+      "name": "Krebs",
+      "braucht": [
+        "koralle"
+      ],
+      "beschreibung": "Läuft seitwärts über den Sand und gräbt sich bei Lärm ein"
+    },
+    {
+      "id": "schnecke",
+      "name": "Schnecke",
+      "braucht": [
+        "seegras"
+      ],
+      "beschreibung": "Kriecht langsam über den Boden und zieht sich bei Lärm ins Haus zurück"
     }
   ]
 }

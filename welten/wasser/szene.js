@@ -8,6 +8,8 @@
  *
  * Verhalten: Je ruhiger die Klasse (env.ruhe 0 … 1), desto mehr Fische
  * schwimmen im Bild. Wird es laut, flüchten die scheuesten zuerst.
+ * Am Boden laufen Krebse und kriechen Schnecken; bei Lärm graben sich die
+ * Krebse ein und die Schnecken ziehen sich ins Haus zurück.
  */
 'use strict';
 
@@ -151,6 +153,202 @@
     }
   }
 
+  // ---------- Bodenbewohner: Krebse und Schnecken ----------
+  // Beide leben auf dem Sand. Bei Ruhe kommen sie heraus und bewegen sich,
+  // bei Lärm verstecken sie sich: Krebse graben sich ein (nur die Augen schauen
+  // heraus), Schnecken ziehen sich in ihr Haus zurück.
+
+  /** Malt eine Pixel-Vorlage (Zeichen → Farbe) auf ein kleines Canvas. */
+  function ausVorlage(zeilen, farben) {
+    var cv = document.createElement('canvas');
+    cv.width = zeilen[0].length;
+    cv.height = zeilen.length;
+    var c = cv.getContext('2d');
+    zeilen.forEach(function (zeile, y) {
+      for (var x = 0; x < zeile.length; x++) {
+        var f = farben[zeile[x]];
+        if (!f) continue;
+        c.fillStyle = f;
+        c.fillRect(x, y, 1, 1);
+      }
+    });
+    return cv;
+  }
+
+  // Krebs von vorn (läuft seitwärts), zwei Bilder für die Beinbewegung
+  var KREBS_KOERPER = [
+    '.OO.........OO.',
+    'OkkO.......OkkO',
+    'OkKO.O...O.OKkO',
+    '.OkO.w...w.OkO.',
+    '..OOOkkkkkOOO..',
+    '..OkkkkkkkkkO..',
+    '..OKKKKKKKKKO..',
+    '...OOOOOOOOO...',
+  ];
+  var KREBS_BEINE = [
+    ['..O.O.....O.O..', '.O.O.......O.O.'],
+    ['...O.O...O.O...', '..O.O.....O.O..'],
+  ];
+  var KREBS_FARBEN = [
+    ['#ff5a4e', '#c23a30'],
+    ['#ff9d2e', '#c96a10'],
+    ['#e0457b', '#a8285a'],
+  ];
+
+  function krebsSprites(pal) {
+    var farben = { O: OUTLINE, k: pal[0], K: pal[1], w: '#ffffff' };
+    return KREBS_BEINE.map(function (beine) {
+      return ausVorlage(KREBS_KOERPER.concat(beine), farben);
+    });
+  }
+
+  // Schnecke (Blick nach rechts): Haus mit Spirale, Körper, Fühler
+  var SCHNECKEN_FARBEN = [
+    { haus: '#d9a066', streifen: '#a8703a', koerper: '#e8d7a8' },
+    { haus: '#f4b8c4', streifen: '#c97a8c', koerper: '#f1e3c8' },
+    { haus: '#a8d0e6', streifen: '#5f8fb0', koerper: '#e3e8d0' },
+    { haus: '#c9d64f', streifen: '#8ba32c', koerper: '#efe6c8' },
+  ];
+
+  function schneckenSprite(pal, mitKoerper) {
+    var W = 15, H = 10;
+    var cv = document.createElement('canvas');
+    cv.width = W;
+    cv.height = H;
+    var c = cv.getContext('2d');
+    function px(x, y, f) {
+      c.fillStyle = f;
+      c.fillRect(x, y, 1, 1);
+    }
+    if (mitKoerper) {
+      // Fuß unter dem Haus und Kopf mit zwei Fühlern rechts
+      for (var x = 1; x <= 12; x++) {
+        px(x, 8, pal.koerper);
+        px(x, 9, OUTLINE);
+      }
+      px(0, 8, OUTLINE);
+      for (var hy = 5; hy <= 8; hy++) {
+        px(12, hy, pal.koerper);
+        px(13, hy, OUTLINE);
+      }
+      px(12, 4, OUTLINE);
+      px(11, 3, OUTLINE); px(11, 2, OUTLINE); px(10, 1, '#20264a');
+      px(13, 3, OUTLINE); px(14, 2, '#20264a');
+      px(12, 6, '#20264a'); // Auge
+    }
+    // Haus: Kreis mit Spiralstreifen
+    var cx = 6, cy = 5, r = 4.2;
+    for (var y = 0; y < H; y++) {
+      for (var x2 = 0; x2 < W; x2++) {
+        var dx = x2 - cx, dy = y - cy;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d > r) continue;
+        if (d > r - 1) { px(x2, y, OUTLINE); continue; }
+        var winkel = (Math.atan2(dy, dx) + Math.PI) / (2 * Math.PI);
+        var band = Math.floor(d * 0.9 + winkel * 1.8) % 2;
+        px(x2, y, band ? pal.streifen : pal.haus);
+      }
+    }
+    px(cx - 1, cy - 2, P.schattiere(pal.haus, 1.35)); // Glanzpunkt
+    return cv;
+  }
+
+  var krebse = [];
+  var schnecken = [];
+
+  function neuerKrebs(i, n, env) {
+    return {
+      bilder: krebsSprites(KREBS_FARBEN[i % KREBS_FARBEN.length]),
+      mut: 0.35 + (i / Math.max(1, n - 1)) * 0.35, // Krebse trauen sich erst bei mehr Ruhe heraus
+      x: env.w * (0.15 + rnd() * 0.7),
+      ziel: env.w * rnd(),
+      pause: rnd() * 2,
+      tiefe: 0, // wie weit eingegraben (Welt-Pixel)
+      schritt: 0,
+    };
+  }
+
+  function neueSchnecke(i, n, env) {
+    var pal = SCHNECKEN_FARBEN[i % SCHNECKEN_FARBEN.length];
+    return {
+      draussen: schneckenSprite(pal, true),
+      versteckt: schneckenSprite(pal, false),
+      mut: 0.2 + (i / Math.max(1, n - 1)) * 0.45,
+      x: env.w * (0.1 + rnd() * 0.8),
+      richtung: rnd() < 0.5 ? -1 : 1,
+      tempo: 1.2 + rnd() * 1.3,
+    };
+  }
+
+  function bodenbewohnerVerteilen(env) {
+    var nKrebse = Math.max(2, Math.round(env.w / 110));
+    var nSchnecken = Math.max(2, Math.round(env.w / 90));
+    krebse = [];
+    schnecken = [];
+    for (var i = 0; i < nKrebse; i++) krebse.push(neuerKrebs(i, nKrebse, env));
+    for (var j = 0; j < nSchnecken; j++) schnecken.push(neueSchnecke(j, nSchnecken, env));
+  }
+
+  /** Zeichnet ein Sprite so, dass es auf dem Sand steht; tiefe > 0 versenkt es im Sand. */
+  function aufSand(ctx, env, bild, x, tiefe, spiegeln) {
+    var bx = Math.round(x - bild.width / 2);
+    var boden = sandY(env, Math.round(x));
+    var by = boden - bild.height + 2 + Math.round(tiefe);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, env.w, boden + 2); // was unter dem Sand liegt, bleibt unsichtbar
+    ctx.clip();
+    if (spiegeln) {
+      ctx.translate(bx + bild.width, by);
+      ctx.scale(-1, 1);
+      ctx.drawImage(bild, 0, 0);
+    } else {
+      ctx.drawImage(bild, bx, by);
+    }
+    ctx.restore();
+  }
+
+  function bewegeUndZeichneSchnecken(ctx, env) {
+    schnecken.forEach(function (s) {
+      var draussen = env.ruhe > s.mut;
+      if (draussen) {
+        s.x += s.richtung * s.tempo * env.dt;
+        if (s.x < 8) s.richtung = 1;
+        else if (s.x > env.w - 8) s.richtung = -1;
+        else if (rnd() < env.dt * 0.03) s.richtung *= -1; // ab und zu umdrehen
+      }
+      aufSand(ctx, env, draussen ? s.draussen : s.versteckt, s.x, draussen ? 0 : 1, s.richtung < 0);
+    });
+  }
+
+  function bewegeUndZeichneKrebse(ctx, env) {
+    krebse.forEach(function (k) {
+      var draussen = env.ruhe > k.mut;
+      var ziel = draussen ? 0 : 7; // eingegraben: nur noch die Augen schauen heraus
+      k.tiefe += Math.sign(ziel - k.tiefe) * Math.min(Math.abs(ziel - k.tiefe), env.dt * 9);
+
+      var laeuft = false;
+      if (draussen && k.tiefe < 1) {
+        if (k.pause > 0) {
+          k.pause -= env.dt;
+        } else {
+          var dx = k.ziel - k.x;
+          if (Math.abs(dx) < 1) {
+            k.ziel = env.w * (0.06 + rnd() * 0.88);
+            k.pause = 0.5 + rnd() * 2.5;
+          } else {
+            k.x += Math.sign(dx) * Math.min(Math.abs(dx), 14 * env.dt);
+            laeuft = true;
+          }
+        }
+      }
+      if (laeuft) k.schritt += env.dt * 8;
+      var bild = k.bilder[Math.floor(k.schritt) % 2];
+      aufSand(ctx, env, bild, k.x, k.tiefe, false);
+    });
+  }
+
   function neuerFisch(i, env) {
     var sp = {
       shape: SHAPE_IDS[Math.floor(rnd() * SHAPE_IDS.length)],
@@ -289,17 +487,21 @@
       fische = [];
       blasen = [];
       verteilen(env);
+      bodenbewohnerVerteilen(env);
       for (var i = 0; i < ANZAHL; i++) fische.push(neuerFisch(i, env));
     },
 
     resize: function (env) {
       verteilen(env);
+      bodenbewohnerVerteilen(env);
     },
 
     draw: function (ctx, env) {
       hintergrund(ctx, env);
       zeichneKorallen(ctx, env);
       zeichneSeegras(ctx, env);
+      bewegeUndZeichneSchnecken(ctx, env);
+      bewegeUndZeichneKrebse(ctx, env);
       bewegeUndZeichneFische(ctx, env);
       zeichneBlasen(ctx, env);
 
