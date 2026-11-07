@@ -6,6 +6,9 @@ import {
   PHASES,
   DEFAULT_PHASE_ID,
   CALIBRATION_MS,
+  METER_RANGE,
+  SENSITIVITY_LIMIT,
+  MIN_FIRST_THRESHOLD,
   type Phase,
 } from './config/levels';
 
@@ -21,6 +24,10 @@ const stageLabel = $<HTMLSpanElement>('stage-label');
 const stageHint = $<HTMLSpanElement>('stage-hint');
 const zonesDim = $<HTMLDivElement>('zones-dim');
 const zonesLit = $<HTMLDivElement>('zones-lit');
+const meter = $<HTMLDivElement>('meter');
+const meterBar = $<HTMLDivElement>('meter-bar');
+const sensHandle = $<HTMLDivElement>('sens-handle');
+const sensReset = $<HTMLButtonElement>('sens-reset');
 const legend = $<HTMLOListElement>('legend');
 const statusEl = $<HTMLParagraphElement>('status');
 const startScreen = $<HTMLElement>('start-screen');
@@ -33,6 +40,13 @@ type Mode = 'idle' | 'calibrating' | 'live' | 'manual';
 let mode: Mode = 'idle';
 let phase: Phase = loadPhase();
 let currentStage = -1;
+/** Live-Verschiebung der Phasen-Schwellen per Schieberegler (dB, + = lockerer). */
+let offset = loadOffset(phase);
+
+/** Wirksame Schwellen = Phase + Schieberegler. */
+function thresholds(): number[] {
+  return phase.thresholds.map((t) => t + offset);
+}
 
 const mic = new MicLevel();
 const tracker = new LoudnessTracker(-60);
@@ -56,6 +70,33 @@ function savePhase(p: Phase): void {
   } catch {
     /* egal */
   }
+}
+
+function loadOffset(p: Phase): number {
+  try {
+    const v = Number(localStorage.getItem(`mm.offset.${p.id}`));
+    return Number.isFinite(v) ? clampOffset(v, p) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveOffset(p: Phase, v: number): void {
+  try {
+    localStorage.setItem(`mm.offset.${p.id}`, String(v));
+  } catch {
+    /* egal */
+  }
+}
+
+/** Erlaubter Bereich des Schiebereglers für eine Phase. */
+function offsetBounds(p: Phase): { lo: number; hi: number } {
+  return { lo: Math.max(-SENSITIVITY_LIMIT, MIN_FIRST_THRESHOLD - p.thresholds[0]), hi: SENSITIVITY_LIMIT };
+}
+
+function clampOffset(v: number, p: Phase = phase): number {
+  const { lo, hi } = offsetBounds(p);
+  return Math.max(lo, Math.min(hi, Math.round(v * 2) / 2));
 }
 
 // ---------- Aufbau ----------
@@ -82,28 +123,89 @@ STAGES.forEach((s, i) => {
   legend.append(li);
 });
 
-/** Messbereich der Anzeige in dB relativ zum Grundpegel. */
-function meterRange(): { min: number; max: number } {
-  return { min: -3, max: phase.thresholds[2] + 9 };
-}
-
+/** dB über Grundpegel → Höhe im Pegelmesser in % (0 = unten). */
 function toPercent(relDb: number): number {
-  const { min, max } = meterRange();
+  const { min, max } = METER_RANGE;
   return Math.max(0, Math.min(100, ((relDb - min) / (max - min)) * 100));
 }
 
+function fromPercent(pct: number): number {
+  const { min, max } = METER_RANGE;
+  return min + (pct / 100) * (max - min);
+}
+
+/** Farbzonen und Regler-Position an die wirksamen Schwellen anpassen. */
 function buildZones(): void {
-  const bounds = [meterRange().min, ...phase.thresholds, meterRange().max];
+  const bounds = [METER_RANGE.min, ...thresholds(), METER_RANGE.max];
   const gradient = STAGES.map((s, i) => {
     const a = toPercent(bounds[i]);
     const b = toPercent(bounds[i + 1]);
     return `${s.color} ${a}% ${b}%`;
   }).join(', ');
-  const bg = `linear-gradient(to right, ${gradient})`;
+  const bg = `linear-gradient(to top, ${gradient})`;
   zonesDim.style.background = bg;
   zonesLit.style.background = bg;
+
+  const red = thresholds()[2];
+  sensHandle.style.setProperty('--pos', String(toPercent(red) / 100));
+  const { lo, hi } = offsetBounds(phase);
+  sensHandle.setAttribute('aria-valuemin', String(phase.thresholds[2] + lo));
+  sensHandle.setAttribute('aria-valuemax', String(phase.thresholds[2] + hi));
+  sensHandle.setAttribute('aria-valuenow', String(red));
+  sensHandle.setAttribute(
+    'aria-valuetext',
+    offset === 0 ? 'Standard' : offset > 0 ? `${offset} dB lockerer` : `${-offset} dB strenger`,
+  );
+  sensReset.hidden = offset === 0;
+}
+
+function setOffset(v: number): void {
+  const next = clampOffset(v);
+  if (next === offset) return;
+  offset = next;
+  saveOffset(phase, offset);
+  buildZones();
 }
 buildZones();
+
+// ---------- Schieberegler: Grenze „Zu laut!“ live verschieben ----------
+// Ziehen am Griff oder Tippen irgendwo auf den Pegelmesser setzt die Grenze dorthin;
+// die beiden unteren Grenzen wandern im gleichen Abstand mit.
+let dragging = false;
+
+function offsetFromPointer(clientY: number): number {
+  const r = meterBar.getBoundingClientRect();
+  const pct = ((r.bottom - clientY) / r.height) * 100;
+  return fromPercent(pct) - phase.thresholds[2];
+}
+
+meter.addEventListener('pointerdown', (e) => {
+  if (mode === 'manual') return;
+  dragging = true;
+  meter.setPointerCapture(e.pointerId);
+  meter.classList.add('dragging');
+  sensHandle.focus({ preventScroll: true });
+  setOffset(offsetFromPointer(e.clientY));
+});
+meter.addEventListener('pointermove', (e) => {
+  if (dragging) setOffset(offsetFromPointer(e.clientY));
+});
+const endDrag = (): void => {
+  dragging = false;
+  meter.classList.remove('dragging');
+};
+meter.addEventListener('pointerup', endDrag);
+meter.addEventListener('pointercancel', endDrag);
+
+sensHandle.addEventListener('keydown', (e) => {
+  const step = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 5, PageDown: -5 }[e.key];
+  if (step !== undefined) setOffset(offset + step);
+  else if (e.key === 'Home' || e.key === 'Escape') setOffset(0);
+  else return;
+  e.preventDefault();
+});
+
+sensReset.addEventListener('click', () => setOffset(0));
 
 // ---------- Anzeige ----------
 function setStage(i: number): void {
@@ -121,7 +223,7 @@ function setStage(i: number): void {
 
 function setLevel(fastRel: number): void {
   const pct = toPercent(fastRel);
-  zonesLit.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+  zonesLit.style.clipPath = `inset(${100 - pct}% 0 0 0)`;
   // Scheibe „atmet“ ein wenig mit der Lautstärke mit.
   const scale = 1 + (pct / 100) * 0.08;
   disk.style.transform = `scale(${scale.toFixed(3)})`;
@@ -146,12 +248,12 @@ function showDebug(t: number, db: number, st: TrackerState): void {
   peakRel = Math.max(peakRel, st.fastRel);
   if (debugEl.hidden || t - lastDebugT < 150) return;
   lastDebugT = t;
-  const [a, b, c] = phase.thresholds;
+  const [a, b, c] = thresholds();
   const f = (n: number) => (n >= 0 ? '+' : '') + n.toFixed(1);
   debugEl.textContent =
     `roh ${db.toFixed(1)} dBFS · Grundpegel ${tracker.baseline.toFixed(1)} dBFS\n` +
     `jetzt ${f(st.fastRel)} dB · geglättet ${f(st.slowRel)} dB · Spitze ${f(peakRel)} dB\n` +
-    `Schwellen ${phase.label}: ${a} / ${b} / ${c} dB · Stufe ${st.stage + 1}` +
+    `Schwellen ${phase.label}${offset ? ` (${offset > 0 ? '+' : ''}${offset})` : ''}: ${a} / ${b} / ${c} dB · Stufe ${st.stage + 1}` +
     (st.pendingStage !== st.stage ? ` → ${st.pendingStage + 1} (${Math.round(st.pendingProgress * 100)} %)` : '');
 }
 
@@ -160,7 +262,7 @@ function loop(t: number): void {
   lastT = t;
   const db = mic.readDbfs();
   if (mode === 'live') {
-    const st = tracker.update(db, t, dt, phase.thresholds);
+    const st = tracker.update(db, t, dt, thresholds());
     render(st);
     showDebug(t, db, st);
   }
@@ -225,7 +327,7 @@ $<HTMLButtonElement>('start-manual').addEventListener('click', () => {
   startScreen.hidden = true;
   app.classList.add('manual');
   btnRecalibrate.hidden = true;
-  zonesLit.style.clipPath = 'inset(0 100% 0 0)';
+  zonesLit.style.clipPath = 'inset(100% 0 0 0)';
   statusEl.textContent = 'Von Hand: Stufe antippen oder Tasten 1–4 drücken.';
   setStage(0);
   void keepAwake();
@@ -235,6 +337,7 @@ $<HTMLButtonElement>('start-manual').addEventListener('click', () => {
 phaseSelect.addEventListener('change', () => {
   phase = PHASES.find((p) => p.id === phaseSelect.value) ?? phase;
   savePhase(phase);
+  offset = loadOffset(phase);
   buildZones();
   if (mode === 'live') {
     statusEl.textContent = statusEl.textContent?.replace(/Phase: .*/, `Phase: ${phase.label}`) ?? '';

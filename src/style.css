@@ -117,7 +117,8 @@ select:focus-visible,
 }
 
 .disk {
-  --size: min(58vmin, 520px);
+  --size: var(--h);
+  flex-shrink: 0;
   width: var(--size);
   height: var(--size);
   border-radius: 50%;
@@ -155,11 +156,50 @@ select:focus-visible,
   opacity: 0.92;
 }
 
-/* Pegelbalken: gedimmte Zonen + hell erleuchteter Anteil bis zum aktuellen Pegel */
+/* Ampel + Pegelmesser nebeneinander */
+.stage-row {
+  --h: min(58vmin, 520px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 5vmin, 64px);
+  max-width: 100%;
+}
+
+/* Pegelmesser (vertikal): gedimmte Zonen + erleuchteter Anteil bis zum aktuellen Pegel */
+.meter-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.meter-cap {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Griffhöhe = Polster oben/unten, damit die Griffmitte exakt den Balken abdeckt */
 .meter {
+  --grip: 30px;
   position: relative;
-  width: min(900px, 100%);
-  height: clamp(28px, 5vh, 52px);
+  height: var(--h);
+  width: clamp(88px, 11vmin, 120px);
+  padding: calc(var(--grip) / 2) 0;
+  display: flex;
+  justify-content: center;
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.meter-bar {
+  position: relative;
+  width: clamp(40px, 6vmin, 64px);
+  height: 100%;
   border-radius: 999px;
   overflow: hidden;
   background: #fff;
@@ -176,11 +216,72 @@ select:focus-visible,
 }
 
 .zones-lit {
-  clip-path: inset(0 100% 0 0);
+  clip-path: inset(100% 0 0 0);
   transition: clip-path 0.08s linear;
 }
 
-.manual .meter {
+/* Schieberegler-Griff: markiert die Grenze zu „Zu laut!“ */
+.sens-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--grip);
+  /* --pos (0…1) wird per JS gesetzt; Mitte des Griffs = Position im Balken */
+  bottom: calc(var(--grip) / 2 + (100% - var(--grip)) * var(--pos, 0.5));
+  transform: translateY(50%);
+  border-radius: 12px;
+  background: #fff;
+  border: 3px solid #1d2327;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+  cursor: grab;
+  transition: bottom 0.12s ease-out;
+}
+
+.sens-handle::before,
+.sens-handle::after {
+  content: '';
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  height: 3px;
+  border-radius: 2px;
+  background: #1d2327;
+  opacity: 0.55;
+}
+
+.sens-handle::before {
+  top: 7px;
+}
+
+.sens-handle::after {
+  bottom: 7px;
+}
+
+.meter.dragging .sens-handle {
+  cursor: grabbing;
+  transition: none;
+  transform: translateY(50%) scale(1.06);
+}
+
+.sens-handle:focus-visible {
+  outline: 3px solid #1d2327;
+  outline-offset: 3px;
+}
+
+.sens-reset {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-height: 36px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  border: 2px solid rgb(0 0 0 / 0.12);
+  background: rgb(255 255 255 / 0.85);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.manual .meter-wrap {
   display: none;
 }
 
@@ -303,8 +404,13 @@ select:focus-visible,
 
 /* Hochformat (Tablet): Scheibe etwas kleiner, damit alles passt */
 @media (orientation: portrait) {
-  .disk {
-    --size: min(72vw, 48vh, 460px);
+  .stage-row {
+    --h: min(54vw, 46vh, 460px);
+    gap: 16px;
+  }
+
+  .meter {
+    width: 76px;
   }
 }
 

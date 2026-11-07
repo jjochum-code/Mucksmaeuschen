@@ -22,14 +22,31 @@
       </header>
 
       <main class="view">
-        <div class="disk" id="disk">
-          <span class="disk-label" id="stage-label"></span>
-          <span class="disk-hint" id="stage-hint"></span>
-        </div>
+        <div class="stage-row">
+          <div class="disk" id="disk">
+            <span class="disk-label" id="stage-label"></span>
+            <span class="disk-hint" id="stage-hint"></span>
+          </div>
 
-        <div class="meter" id="meter" aria-hidden="true">
-          <div class="zones zones-dim" id="zones-dim"></div>
-          <div class="zones zones-lit" id="zones-lit"></div>
+          <div class="meter-wrap">
+            <span class="meter-cap">laut</span>
+            <div class="meter" id="meter">
+              <div class="meter-bar" id="meter-bar">
+                <div class="zones zones-dim" id="zones-dim"></div>
+                <div class="zones zones-lit" id="zones-lit"></div>
+              </div>
+              <div
+                class="sens-handle"
+                id="sens-handle"
+                role="slider"
+                tabindex="0"
+                aria-label="Grenze für „Zu laut!“ – nach oben ziehen erlaubt mehr Lautstärke"
+                aria-orientation="vertical"
+              ></div>
+            </div>
+            <span class="meter-cap">leise</span>
+            <button type="button" class="sens-reset" id="sens-reset" hidden>Zurücksetzen</button>
+          </div>
         </div>
 
         <ol class="legend" id="legend" aria-label="Stufen"></ol>

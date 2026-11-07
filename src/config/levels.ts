@@ -38,5 +38,14 @@ export const PHASES: readonly Phase[] = [
 
 export const DEFAULT_PHASE_ID = 'unterricht';
 
+/** Anzeigebereich des Pegelmessers in dB relativ zum Grundpegel. */
+export const METER_RANGE = { min: -3, max: 40 } as const;
+
+/** Wie weit der Schieberegler die Schwellen einer Phase verschieben darf (dB). */
+export const SENSITIVITY_LIMIT = 12;
+
+/** Die unterste Grenze bleibt mindestens so weit über dem Grundpegel – sonst gäbe es kein Grün mehr. */
+export const MIN_FIRST_THRESHOLD = 3;
+
 /** Dauer der Grundpegel-Messung. */
 export const CALIBRATION_MS = 4000;
