@@ -1,0 +1,17 @@
+{
+  "name": "mucksmaeuschen",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ruhe-Aufbauspiel für die Grundschule – misst lokal die Lautstärke im Klassenraum.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.1.12"
+  }
+}

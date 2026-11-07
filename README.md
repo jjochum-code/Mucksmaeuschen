@@ -9,38 +9,15 @@ Die Lautstärke wird **nur lokal** im Browser ausgewertet – nichts wird aufgez
 - 4 Farbstufen: Mucksmäuschenstill · Leise · Etwas laut · Zu laut!
 - Glättung + Verzögerung (Stufe steigt erst nach 1,5 s, fällt nach 1,2 s)
 - Phasen Stillarbeit / Unterricht / Gruppenarbeit mit eigenen Schwellen
-- Vertikaler Pegelmesser neben der Ampel mit Schieberegler: Der Griff markiert die
-  Grenze zu „Zu laut!“ und lässt sich über die ganze Höhe (0–40 dB über Grundpegel)
-  ziehen oder per Pfeiltasten verschieben; die Grenzen zu „Leise“ und „Etwas laut“
-  wachsen im gleichen Verhältnis mit. Wird je Phase gemerkt.
 - Handbetrieb ohne Mikrofon (Stufe antippen oder Tasten 1–4), Vollbild, Bildschirm bleibt an
 
-## Aufbau
-Reines HTML, CSS und JavaScript – kein Build-Schritt, keine Abhängigkeiten.
-
-```
-index.html           Seite
-css/style.css        Gestaltung
-js/config.js         Stufen, Phasen, Grenzwerte (Daten)
-js/loudness.js       Glättung und Stufenlogik
-js/mic.js            Mikrofon → Pegel (Web Audio)
-js/app.js            Oberfläche und Ablauf
-nginx/default.conf   nginx-Konfiguration (Sicherheits-Header, Mikrofon-Freigabe)
-docker-compose.yml   startet nginx lokal
-```
-
-## Lokal starten (nginx)
-Das Mikrofon braucht `https` oder `localhost`. Mit Docker (z. B. Docker Desktop oder Colima):
-
+## Entwickeln
 ```bash
-docker compose up -d
+npm install
+npm run dev
 ```
 
-Dann http://localhost:8080 öffnen. Änderungen an HTML/CSS/JS sind nach einem Neuladen
-sofort sichtbar. Stoppen mit `docker compose down`.
-
-Ohne Docker lässt sich `nginx/default.conf` auch in eine vorhandene nginx-Installation
-übernehmen – dann `root` auf den Projektordner setzen.
+Stufen und Phasen stehen in `src/config/levels.ts`, die Mess- und Glättungslogik in `src/audio/`.
 
 ## Lizenz
 MIT

@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#2f9e57" />
     <meta name="description" content="Mucksmäuschen – Lautstärke-Anzeige für die Grundschule. Audio wird nur lokal ausgewertet." />
     <title>Mucksmäuschen</title>
-    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <div id="app">
@@ -17,37 +16,23 @@
             <span>Phase</span>
             <select id="phase"></select>
           </label>
+          <button id="rewards-open" type="button" class="btn rewards-open" aria-haspopup="dialog">
+            🌼 Belohnungen <span id="star-badge" class="star-badge">0 ⭐</span>
+          </button>
           <button id="recalibrate" type="button" class="btn">Neu kalibrieren</button>
           <button id="fullscreen" type="button" class="btn">Vollbild</button>
         </div>
       </header>
 
       <main class="view">
-        <div class="stage-row">
-          <div class="disk" id="disk">
-            <span class="disk-label" id="stage-label"></span>
-            <span class="disk-hint" id="stage-hint"></span>
-          </div>
+        <div class="disk" id="disk">
+          <span class="disk-label" id="stage-label"></span>
+          <span class="disk-hint" id="stage-hint"></span>
+        </div>
 
-          <div class="meter-wrap">
-            <span class="meter-cap">laut</span>
-            <div class="meter" id="meter">
-              <div class="meter-bar" id="meter-bar">
-                <div class="zones zones-dim" id="zones-dim"></div>
-                <div class="zones zones-lit" id="zones-lit"></div>
-              </div>
-              <div
-                class="sens-handle"
-                id="sens-handle"
-                role="slider"
-                tabindex="0"
-                aria-label="Grenze für „Zu laut!“ – nach oben ziehen erlaubt mehr Lautstärke"
-                aria-orientation="vertical"
-              ></div>
-            </div>
-            <span class="meter-cap">leise</span>
-            <button type="button" class="sens-reset" id="sens-reset">Zurücksetzen</button>
-          </div>
+        <div class="meter" id="meter" aria-hidden="true">
+          <div class="zones zones-dim" id="zones-dim"></div>
+          <div class="zones zones-lit" id="zones-lit"></div>
         </div>
 
         <ol class="legend" id="legend" aria-label="Stufen"></ol>
@@ -78,10 +63,49 @@
           <div class="progress"><div class="progress-fill" id="calib-fill"></div></div>
         </div>
       </section>
+
+      <section class="overlay rewards-overlay" id="reward-screen" hidden>
+        <div class="card rewards-card" role="dialog" aria-modal="true" aria-labelledby="rewards-title">
+          <div class="rewards-heading">
+            <div>
+              <p class="eyebrow">Unser gemeinsames Ruhe-Abenteuer</p>
+              <h2 id="rewards-title">Die Sternenwiese</h2>
+            </div>
+            <button id="rewards-close" class="btn close-rewards" type="button" aria-label="Belohnungen schließen">✕</button>
+          </div>
+
+          <div class="reward-summary">
+            <div class="star-count" aria-live="polite"><span aria-hidden="true">⭐</span> <strong id="star-count">0</strong><span> Sterne</span></div>
+            <p id="reward-message" class="reward-message">Arbeitet mucksmäuschenstill – gemeinsam füllt ihr eure Wiese!</p>
+          </div>
+
+          <section class="meadow-section" aria-labelledby="meadow-title">
+            <div class="section-heading">
+              <div>
+                <h3 id="meadow-title">Eure Blumenwiese</h3>
+                <p id="flower-count">Noch keine Blumen – die erste wächst bald!</p>
+              </div>
+              <span class="quiet-timer" id="quiet-timer">🌱 0:00 / 1:00</span>
+            </div>
+            <div class="meadow" id="meadow" role="img" aria-label="Eine Wiese mit noch keinen gewachsenen Blumen"></div>
+            <div id="reward-progress" class="progress reward-progress" role="progressbar" aria-label="Fortschritt bis zur nächsten Blume" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0">
+              <div class="progress-fill" id="reward-progress-fill"></div>
+            </div>
+            <p class="meadow-note">Eine Minute auf <strong>Mucksmäuschenstill</strong> lässt eine Blume wachsen und bringt euch einen Stern. Bei anderen Stufen pausiert der Fortschritt.</p>
+          </section>
+
+          <section class="animals-section" aria-labelledby="animals-title">
+            <div class="section-heading">
+              <div>
+                <h3 id="animals-title">Tiere für eure Wiese</h3>
+                <p>Sammelt Sterne und schaltet neue Freunde frei.</p>
+              </div>
+            </div>
+            <div class="animal-grid" id="animal-grid"></div>
+          </section>
+        </div>
+      </section>
     </div>
-    <script src="js/config.js"></script>
-    <script src="js/loudness.js"></script>
-    <script src="js/mic.js"></script>
-    <script src="js/app.js"></script>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
