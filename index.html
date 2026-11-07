@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#2f9e57" />
+    <meta name="description" content="Mucksmäuschen – Lautstärke-Anzeige für die Grundschule. Audio wird nur lokal ausgewertet." />
+    <title>Mucksmäuschen</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <h1 class="brand">Mucksmäuschen</h1>
+        <div class="controls">
+          <label class="field">
+            <span>Phase</span>
+            <select id="phase"></select>
+          </label>
+          <button id="recalibrate" type="button" class="btn">Neu kalibrieren</button>
+          <button id="fullscreen" type="button" class="btn">Vollbild</button>
+        </div>
+      </header>
+
+      <main class="view">
+        <div class="disk" id="disk">
+          <span class="disk-label" id="stage-label"></span>
+          <span class="disk-hint" id="stage-hint"></span>
+        </div>
+
+        <div class="meter" id="meter" aria-hidden="true">
+          <div class="zones zones-dim" id="zones-dim"></div>
+          <div class="zones zones-lit" id="zones-lit"></div>
+        </div>
+
+        <ol class="legend" id="legend" aria-label="Stufen"></ol>
+        <p class="status" id="status" role="status"></p>
+        <pre class="debug" id="debug" hidden></pre>
+      </main>
+
+      <section class="overlay" id="start-screen">
+        <div class="card">
+          <h2>Mucksmäuschen</h2>
+          <p>Die Klasse sieht, wie laut es gerade ist – in vier Farbstufen.</p>
+          <div class="card-actions">
+            <button id="start-mic" type="button" class="btn btn-primary">Mikrofon starten</button>
+            <button id="start-manual" type="button" class="btn">Ohne Mikrofon (von Hand steuern)</button>
+          </div>
+          <p class="fine">
+            Datenschutz: Der Ton wird nur auf diesem Gerät ausgewertet und
+            nie gespeichert oder verschickt.
+          </p>
+          <p class="error" id="start-error" hidden></p>
+        </div>
+      </section>
+
+      <section class="overlay" id="calib-screen" hidden>
+        <div class="card">
+          <h2>Psst …</h2>
+          <p>Bitte ein paar Sekunden ganz leise sein.<br />Ich höre, wie still es im Raum ist.</p>
+          <div class="progress"><div class="progress-fill" id="calib-fill"></div></div>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
