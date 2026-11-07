@@ -18,23 +18,28 @@ Die Lautstärke wird **nur lokal** im Browser ausgewertet – nichts wird aufgez
 Reines HTML, CSS und JavaScript – kein Build-Schritt, keine Abhängigkeiten.
 
 ```
-index.html        Seite
-css/style.css     Gestaltung
-js/config.js      Stufen, Phasen, Grenzwerte (Daten)
-js/loudness.js    Glättung und Stufenlogik
-js/mic.js         Mikrofon → Pegel (Web Audio)
-js/app.js         Oberfläche und Ablauf
+index.html           Seite
+css/style.css        Gestaltung
+js/config.js         Stufen, Phasen, Grenzwerte (Daten)
+js/loudness.js       Glättung und Stufenlogik
+js/mic.js            Mikrofon → Pegel (Web Audio)
+js/app.js            Oberfläche und Ablauf
+nginx/default.conf   nginx-Konfiguration (Sicherheits-Header, Mikrofon-Freigabe)
+docker-compose.yml   startet nginx lokal
 ```
 
-## Lokal starten
-Das Mikrofon braucht `https` oder `localhost`, deshalb über einen kleinen Webserver öffnen:
+## Lokal starten (nginx)
+Das Mikrofon braucht `https` oder `localhost`. Mit Docker (z. B. Docker Desktop oder Colima):
 
 ```bash
-python3 -m http.server 5173
+docker compose up -d
 ```
 
-Dann http://localhost:5173 im Browser öffnen. Zum Veröffentlichen genügt es, die Dateien
-auf einen statischen Webspace (z. B. GitLab/GitHub Pages) zu legen.
+Dann http://localhost:8080 öffnen. Änderungen an HTML/CSS/JS sind nach einem Neuladen
+sofort sichtbar. Stoppen mit `docker compose down`.
+
+Ohne Docker lässt sich `nginx/default.conf` auch in eine vorhandene nginx-Installation
+übernehmen – dann `root` auf den Projektordner setzen.
 
 ## Lizenz
 MIT
