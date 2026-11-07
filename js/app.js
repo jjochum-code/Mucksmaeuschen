@@ -18,9 +18,7 @@
   var phaseSelect = $('phase');
   var btnRecalibrate = $('recalibrate');
   var btnFullscreen = $('fullscreen');
-  var disk = $('disk');
   var stageLabel = $('stage-label');
-  var stageHint = $('stage-hint');
   var zonesDim = $('zones-dim');
   var zonesLit = $('zones-lit');
   var meter = $('meter');
@@ -34,6 +32,9 @@
   var calibScreen = $('calib-screen');
   var calibFill = $('calib-fill');
   var debugEl = $('debug');
+  var weltSelect = $('welt');
+  var weltAuswahl = $('welt-auswahl');
+  var weltCanvas = $('welt-canvas');
 
   // ---------- Zustand ----------
   /** 'idle' | 'calibrating' | 'live' | 'manual' */
@@ -203,19 +204,84 @@
     app.style.setProperty('--stage', s.color);
     app.style.setProperty('--stage-ink', s.ink);
     stageLabel.textContent = s.label;
-    stageHint.textContent = s.hint;
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', s.color);
     var chips = legend.querySelectorAll('.chip');
     for (var k = 0; k < chips.length; k++) chips[k].classList.toggle('active', k === i);
+    MM.welten.setStufe(i);
   }
 
   function setLevel(fastRel) {
     var pct = toPercent(fastRel);
     zonesLit.style.clipPath = 'inset(' + (100 - pct) + '% 0 0 0)';
-    // Scheibe „atmet“ ein wenig mit der Lautstärke mit.
-    disk.style.transform = 'scale(' + (1 + (pct / 100) * 0.08).toFixed(3) + ')';
   }
+
+  // ---------- Spielwelten ----------
+  // Karten im Startbildschirm + Auswahl in der Kopfzeile; die Welt selbst malt js/welten.js.
+  function weltWaehlen(id) {
+    store('mm.welt', id);
+    weltSelect.value = id;
+    var karten = weltAuswahl.querySelectorAll('.welt-karte');
+    for (var k = 0; k < karten.length; k++) {
+      karten[k].setAttribute('aria-checked', String(karten[k].dataset.id === id));
+    }
+    MM.welten.aktivieren(id, weltCanvas);
+  }
+
+  function weltKarte(w) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'welt-karte';
+    btn.dataset.id = w.id;
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', 'false');
+    var img = document.createElement('img');
+    img.src = w.ordner + (w.vorschau || 'vorschau.svg');
+    img.alt = '';
+    var name = document.createElement('span');
+    name.className = 'welt-name';
+    name.textContent = w.name;
+    var info = document.createElement('span');
+    info.className = 'welt-info';
+    info.textContent = w.beschreibung || '';
+    btn.append(img, name, info);
+    if (w.status === 'platzhalter') {
+      var badge = document.createElement('span');
+      badge.className = 'welt-badge';
+      badge.textContent = 'im Aufbau';
+      btn.append(badge);
+    }
+    btn.addEventListener('click', function () {
+      weltWaehlen(w.id);
+    });
+    return btn;
+  }
+
+  MM.welten.laden().then(
+    function (liste) {
+      if (!liste.length) throw new Error('keine Welten');
+      liste.forEach(function (w) {
+        var opt = document.createElement('option');
+        opt.value = w.id;
+        opt.textContent = w.name;
+        weltSelect.appendChild(opt);
+        weltAuswahl.appendChild(weltKarte(w));
+      });
+      var gemerkt = store('mm.welt');
+      var start = liste.some(function (w) { return w.id === gemerkt; }) ? gemerkt : liste[0].id;
+      weltWaehlen(start);
+    },
+    function (err) {
+      console.warn('Welten konnten nicht geladen werden:', err);
+      weltAuswahl.textContent =
+        'Die Welten konnten nicht geladen werden. Bitte die Seite über den Webserver öffnen (siehe README).';
+      weltSelect.closest('.field').hidden = true;
+    }
+  );
+
+  weltSelect.addEventListener('change', function () {
+    weltWaehlen(weltSelect.value);
+  });
 
   // ---------- Messwerte zum Einstellen: Taste „D“ oder ?debug in der Adresse ----------
   debugEl.hidden = !/[?&]debug\b/.test(location.search);

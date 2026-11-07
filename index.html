@@ -14,6 +14,10 @@
         <h1 class="brand">Mucksmäuschen</h1>
         <div class="controls">
           <label class="field">
+            <span>Welt</span>
+            <select id="welt"></select>
+          </label>
+          <label class="field">
             <span>Phase</span>
             <select id="phase"></select>
           </label>
@@ -23,12 +27,14 @@
       </header>
 
       <main class="view">
-        <div class="stage-row">
-          <div class="disk" id="disk">
-            <span class="disk-label" id="stage-label"></span>
-            <span class="disk-hint" id="stage-hint"></span>
-          </div>
+        <!-- Spielwelt über den ganzen Bildschirm: gemalt von js/welten.js und welten/<id>/szene.js -->
+        <div class="welt-buehne" id="welt-buehne">
+          <canvas id="welt-canvas" aria-label="Spielwelt"></canvas>
+        </div>
 
+        <!-- rechts: aktuelle Stufe + Pegelmesser mit Schieberegler -->
+        <aside class="hud hud-rechts">
+          <div class="stufe" aria-live="polite"><span id="stage-label"></span></div>
           <div class="meter-wrap">
             <span class="meter-cap">laut</span>
             <div class="meter" id="meter">
@@ -48,17 +54,25 @@
             <span class="meter-cap">leise</span>
             <button type="button" class="sens-reset" id="sens-reset">Zurücksetzen</button>
           </div>
-        </div>
+        </aside>
 
-        <ol class="legend" id="legend" aria-label="Stufen"></ol>
-        <p class="status" id="status" role="status"></p>
-        <pre class="debug" id="debug" hidden></pre>
+        <!-- unten: Stufen-Leiste (im Handbetrieb zum Antippen), Status, Messwerte -->
+        <div class="hud hud-unten">
+          <ol class="legend" id="legend" aria-label="Stufen"></ol>
+          <p class="status" id="status" role="status"></p>
+          <pre class="debug" id="debug" hidden></pre>
+        </div>
       </main>
 
       <section class="overlay" id="start-screen">
         <div class="card">
           <h2>Mucksmäuschen</h2>
-          <p>Die Klasse sieht, wie laut es gerade ist – in vier Farbstufen.</p>
+          <p>Ist die Klasse ruhig, wird die Welt lebendig. Wird es laut, zieht sie sich zurück.</p>
+
+          <h3 class="card-step">1. Welt wählen</h3>
+          <div class="welt-auswahl" id="welt-auswahl" role="radiogroup" aria-label="Spielwelt"></div>
+
+          <h3 class="card-step">2. Starten</h3>
           <div class="card-actions">
             <button id="start-mic" type="button" class="btn btn-primary">Mikrofon starten</button>
             <button id="start-manual" type="button" class="btn">Ohne Mikrofon (von Hand steuern)</button>
@@ -82,6 +96,7 @@
     <script src="js/config.js"></script>
     <script src="js/loudness.js"></script>
     <script src="js/mic.js"></script>
+    <script src="js/welten.js"></script>
     <script src="js/app.js"></script>
   </body>
 </html>

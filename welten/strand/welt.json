@@ -1,0 +1,35 @@
+{
+  "name": "Strand",
+  "beschreibung": "Sand, Muscheln und Wellen",
+  "status": "platzhalter",
+  "vorschau": "vorschau.svg",
+  "farben": {
+    "himmel": "#8fd0ff",
+    "horizont": "#fff4d6",
+    "boden": "#f2d59b"
+  },
+  "items": [
+    {
+      "id": "sandburg",
+      "name": "Sandburg",
+      "preis": 12,
+      "beschreibung": "Mit Türmchen"
+    },
+    {
+      "id": "palme",
+      "name": "Palme",
+      "preis": 16,
+      "beschreibung": "Spendet Schatten"
+    }
+  ],
+  "kreaturen": [
+    {
+      "id": "krabbe",
+      "name": "Krabbe",
+      "braucht": [
+        "sandburg"
+      ],
+      "beschreibung": "Krabbelt zur Sandburg"
+    }
+  ]
+}
