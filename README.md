@@ -14,13 +14,27 @@ Die Lautstärke wird **nur lokal** im Browser ausgewertet – nichts wird aufgez
   wandern mit; wird je Phase gemerkt
 - Handbetrieb ohne Mikrofon (Stufe antippen oder Tasten 1–4), Vollbild, Bildschirm bleibt an
 
-## Entwickeln
-```bash
-npm install
-npm run dev
+## Aufbau
+Reines HTML, CSS und JavaScript – kein Build-Schritt, keine Abhängigkeiten.
+
+```
+index.html        Seite
+css/style.css     Gestaltung
+js/config.js      Stufen, Phasen, Grenzwerte (Daten)
+js/loudness.js    Glättung und Stufenlogik
+js/mic.js         Mikrofon → Pegel (Web Audio)
+js/app.js         Oberfläche und Ablauf
 ```
 
-Stufen und Phasen stehen in `src/config/levels.ts`, die Mess- und Glättungslogik in `src/audio/`.
+## Lokal starten
+Das Mikrofon braucht `https` oder `localhost`, deshalb über einen kleinen Webserver öffnen:
+
+```bash
+python3 -m http.server 5173
+```
+
+Dann http://localhost:5173 im Browser öffnen. Zum Veröffentlichen genügt es, die Dateien
+auf einen statischen Webspace (z. B. GitLab/GitHub Pages) zu legen.
 
 ## Lizenz
 MIT

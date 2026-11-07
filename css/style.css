@@ -158,7 +158,8 @@ select:focus-visible,
 
 /* Ampel + Pegelmesser nebeneinander */
 .stage-row {
-  --h: min(58vmin, 520px);
+  /* Höhe von Ampel und Pegelmesser; bei niedrigen Fenstern Platz für Kopfzeile + Legende lassen */
+  --h: min(58vmin, 520px, calc(100dvh - 290px));
   display: flex;
   align-items: center;
   justify-content: center;
