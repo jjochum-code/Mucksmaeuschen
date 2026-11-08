@@ -1,8 +1,9 @@
 {
   "name": "Dschungel",
-  "beschreibung": "Riesige Blätter, Lianen und bunte Vögel",
-  "status": "platzhalter",
-  "vorschau": "vorschau.svg",
+  "beschreibung": "Riesige Bäume, Lianen, ein Orang-Utan, ein Tukan, eine Schlange und Schmetterlinge",
+  "status": "spielbar",
+  "vorschau": "vorschau.webp",
+  "pixel": 2,
   "farben": {
     "himmel": "#8fd6b0",
     "horizont": "#d9f5c8",
@@ -24,12 +25,36 @@
   ],
   "kreaturen": [
     {
-      "id": "papagei",
-      "name": "Papagei",
+      "id": "tukan",
+      "name": "Tukan",
       "braucht": [
         "liane"
       ],
-      "beschreibung": "Landet auf den Lianen"
+      "beschreibung": "Landet auf den Ästen, wenn es ruhig ist"
+    },
+    {
+      "id": "schlange",
+      "name": "Schlange",
+      "braucht": [
+        "riesenblatt"
+      ],
+      "beschreibung": "Schlängelt über den Waldboden und versteckt sich bei Lärm"
+    },
+    {
+      "id": "affe",
+      "name": "Orang-Utan",
+      "braucht": [
+        "liane"
+      ],
+      "beschreibung": "Hangelt sich an den Lianen entlang, wenn es ganz ruhig ist"
+    },
+    {
+      "id": "schmetterling",
+      "name": "Schmetterling",
+      "braucht": [
+        "riesenblatt"
+      ],
+      "beschreibung": "Flattert umher und landet auf den Blüten"
     }
   ]
 }

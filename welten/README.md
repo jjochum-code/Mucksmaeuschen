@@ -62,7 +62,7 @@ Die id in `register('…')` muss genau dem Ordnernamen entsprechen.
 
 | Feld | Bedeutung |
 |---|---|
-| `env.w`, `env.h` | Größe der Welt in **Welt-Pixeln** (1 Welt-Pixel = 4 Bildschirm-Pixel → Pixel-Look) |
+| `env.w`, `env.h` | Größe der Welt in **Welt-Pixeln** (1 Welt-Pixel = 4 Bildschirm-Pixel → Pixel-Look; mit `"pixel"` in `welt.json` änderbar) |
 | `env.ruhe` | **0 = laut … 1 = ganz ruhig**, sanft geglättet. Damit steuert ihr, wie lebendig die Welt ist. |
 | `env.stufe` | Ampelstufe 0 (still) bis 3 (zu laut) |
 | `env.t`, `env.dt` | Zeit seit Start und seit dem letzten Bild (Sekunden) – für Animationen |
@@ -108,6 +108,8 @@ baum.src = 'welten/wald/assets/baum.png';
 ```
 
 - `status`: `"platzhalter"` zeigt in der Auswahl „im Aufbau“, `"spielbar"` blendet das aus.
+- `pixel` (optional, 1–8, Standard 4): wie grob die Welt gemalt wird. 4 = deutlicher Pixel-Look
+  (Wasser), 2 = feiner – sinnvoll, wenn ihr detaillierte Bilder verwendet (Dschungel).
 - `items` sind Landschaftselemente, die die Klasse später mit ihrer Ruhe-Währung kauft.
 - `kreaturen` kommen von selbst, wenn alles aus `braucht` vorhanden ist.
   Items und Kreaturen sind schon als Daten angelegt, das Kaufen kommt in einem späteren Schritt.

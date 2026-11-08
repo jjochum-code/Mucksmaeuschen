@@ -15,8 +15,16 @@
 window.MM = window.MM || {};
 
 (function () {
-  /** Größe eines Welt-Pixels in Bildschirm-Pixeln (Pixel-Look). */
+  /**
+   * Größe eines Welt-Pixels in Bildschirm-Pixeln (Pixel-Look). Eine Welt kann in
+   * welt.json mit "pixel": 1…8 eine eigene Größe wählen – kleiner = schärfer.
+   */
   var PIXEL = 4;
+
+  function pixelGroesse(welt) {
+    var p = Number(welt && welt.pixel);
+    return p >= 1 && p <= 8 ? p : PIXEL;
+  }
   /** Wie träge die „Ruhe“ der Stufe folgt (Sekunden) – Welt reagiert sanft, nicht hektisch. */
   var RUHE_TAU = 1.5;
 
@@ -155,8 +163,9 @@ window.MM = window.MM || {};
   function groesseAnpassen() {
     if (!aktiv) return;
     var c = aktiv.canvas;
-    var w = Math.max(40, Math.round(c.clientWidth / PIXEL));
-    var h = Math.max(30, Math.round(c.clientHeight / PIXEL));
+    var px = pixelGroesse(aktiv.welt);
+    var w = Math.max(40, Math.round(c.clientWidth / px));
+    var h = Math.max(30, Math.round(c.clientHeight / px));
     if (c.width === w && c.height === h) return;
     c.width = w;
     c.height = h;
