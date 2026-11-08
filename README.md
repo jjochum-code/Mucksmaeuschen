@@ -63,32 +63,15 @@ docker compose up -d
 
 Dann http://localhost:8080 öffnen, stoppen mit `docker compose down`.
 
-## Roadmap / ToDos
+## Roadmap
 
-**Als Nächstes**
-- [ ] Team-Branches zusammenführen (`welt-wald`, `Belohnungssystem`) – Weltdaten dabei
-      von `welt.json` auf `welt.js` umstellen
-- [ ] Mit echtem Mikrofon in einer Klasse testen und die Standard-Schwellen der Phasen anpassen
-- [ ] Wiese ausbauen
+| Milestone | Wann | Ziel |
+|---|---|---|
+| **1 – Spielwelten** | ✅ Saar Hackathon, 7./8. Nov. 2026 | Lautstärke messen, Welten reagieren auf Ruhe |
+| **2 – Ruhe lohnt sich** | Saar Hackathon, 1./2. Mai 2027 | Ruhe-Blöcke (10/15/30 min), Punkte, Itemstore mit Abstimmung, Spielstand |
+| **3 – Unser Klassentier** | danach | Klassentier (z. B. „Affenklasse“), das mit der Klasse wächst |
 
-**Das eigentliche Aufbauspiel**
-- [ ] Ruhe-Runden: Dauer festlegen (z. B. 10 min), am Ende Belohnung je nach Ruhe
-- [ ] Währung (z. B. „Mucks-Münzen“) und Shop je Welt – die Items stehen schon in `welt.js`
-- [ ] Gekaufte Items in der Szene anzeigen; Kreaturen kommen von selbst, wenn ihre
-      Bedingungen (`braucht`) erfüllt sind
-- [ ] Spielstand speichern (localStorage/IndexedDB) und als JSON-Datei exportieren/importieren
-- [ ] Mehrere Klassen auf einem Gerät (eigener Spielstand je Klasse)
-
-**Für Lehrkräfte**
-- [ ] Einstellungsseite (Phasen, Rundendauer, Schwellen) statt Code
-- [ ] Kurze Anleitung im Startbildschirm, Hinweise zu Mikrofon und Datenschutz
-
-**Später**
-- [ ] Hosting (z. B. GitLab Pages) mit HTTPS
-- [ ] PWA: Service Worker (offline nach erstem Besuch) und Manifest (installierbar)
-- [ ] Leistung auf älteren Smartboards prüfen (Bildgrößen, Pixelgröße je Welt)
-- [ ] Herkunft/Lizenz aller Grafiken dokumentieren
-- [ ] Automatische Tests für die Lautstärke-Logik (`js/loudness.js`)
+Details, Entscheidungen und Aufgaben: [ROADMAP.md](ROADMAP.md)
 
 ## Lizenz
 MIT – entstanden beim [Saar Hackathon 2026](https://www.what-the-hack.saarland/).
