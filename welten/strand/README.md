@@ -22,14 +22,14 @@ Ausprobieren: „Ohne Mikrofon“ starten und mit den Tasten **1–4** die Stufe
 
 | Datei | Wofür |
 |---|---|
-| `welt.json` | Name, Farben (Himmel, Meer, Sand …), Items und Kreaturen |
+| `welt.js` | Name, Farben (Himmel, Meer, Sand …), Items und Kreaturen |
 | `szene.js` | Zeichnung und Verhalten aller Bewohner |
 | `vorschau.svg` | Bild für die Auswahl im Startbildschirm |
 | `assets/` | (noch leer) |
 
 ## Selbst ändern / Make changes
 
-- **Farben** von Himmel, Meer und Sand stehen in `welt.json`.
+- **Farben** von Himmel, Meer und Sand stehen in `welt.js`.
 - **Tiere und Gegenstände** sind in `szene.js` als Text-Pixelbilder gemalt: jeder Buchstabe
   ist ein Pixel, `.` ist durchsichtig. Welche Farbe ein Buchstabe hat, steht in `FARBEN`.
 - **Wo** etwas steht, steht in `aufbauen()` als Anteil von Breite und Höhe (0 … 1).

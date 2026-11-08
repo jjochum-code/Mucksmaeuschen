@@ -2,10 +2,11 @@
  * Mucksmäuschen – Spielwelten
  *
  * Jede Welt liegt in einem eigenen Ordner unter welten/<id>/:
- *   welt.json      Daten (Name, Beschreibung, Farben, später Items und Tiere)
+ *   welt.js        Daten (Name, Beschreibung, Farben, Items und Tiere) – meldet sich mit MM.welten.daten an
  *   szene.js       Zeichnet die Welt (meldet sich mit MM.welten.register an)
  *   vorschau.svg   Bild für die Auswahl im Startbildschirm
- * Welche Welten es gibt, steht in welten/welten.json.
+ * Welche Welten es gibt, steht in welten/liste.js.
+ * Alles wird per <script> geladen, damit die App auch ohne Webserver (Doppelklick) läuft.
  *
  * Die Welt wird in niedriger Auflösung (Pixel-Look) auf ein Canvas gemalt und
  * groß skaliert. Sie bekommt in jedem Bild, wie ruhig die Klasse gerade ist.
@@ -17,7 +18,7 @@ window.MM = window.MM || {};
 (function () {
   /**
    * Größe eines Welt-Pixels in Bildschirm-Pixeln (Pixel-Look). Eine Welt kann in
-   * welt.json mit "pixel": 1…8 eine eigene Größe wählen – kleiner = schärfer.
+   * welt.js mit "pixel": 1…8 eine eigene Größe wählen – kleiner = schärfer.
    */
   var PIXEL = 4;
 
@@ -29,7 +30,7 @@ window.MM = window.MM || {};
   var RUHE_TAU = 1.5;
 
   var szenen = {};      // id → Szene-Objekt aus szene.js
-  var liste = [];       // Daten aus welt.json, in der Reihenfolge von welten.json
+  var liste = [];       // Daten aus welt.js, in der Reihenfolge von welten/liste.js
   var aktiv = null;     // { welt, szene, canvas, ctx, env }
   var zielRuhe = 1;
   var rafId = 0;
@@ -115,30 +116,50 @@ window.MM = window.MM || {};
   }
 
   // ---------- Laden ----------
-  function ladeJson(url) {
-    return fetch(url, { cache: 'no-cache' }).then(function (r) {
-      if (!r.ok) throw new Error(url + ': ' + r.status);
-      return r.json();
+  var daten = {}; // id → Inhalt aus welten/<id>/welt.js
+
+  /** Lädt ein Skript per <script>-Tag – funktioniert auch ohne Webserver (file://). */
+  function ladeSkript(url) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = url;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { reject(new Error(url + ' fehlt')); };
+      document.head.appendChild(s);
     });
   }
 
-  /** Liest welten/welten.json und alle welt.json. Fehlerhafte Welten werden übersprungen. */
+  /** Daten einer Welt: zuerst welt.js, sonst (nur mit Webserver) eine ältere welt.json. */
+  function ladeWeltDaten(id) {
+    var ordner = 'welten/' + id + '/';
+    return ladeSkript(ordner + 'welt.js')
+      .then(function () {
+        if (!daten[id]) throw new Error(ordner + 'welt.js ruft MM.welten.daten(\'' + id + '\', …) nicht auf');
+        return daten[id];
+      })
+      .catch(function (err) {
+        return fetch(ordner + 'welt.json', { cache: 'no-cache' }).then(function (r) {
+          if (!r.ok) throw err;
+          return r.json();
+        }, function () { throw err; });
+      })
+      .then(function (w) {
+        w.id = id;
+        w.ordner = ordner;
+        return w;
+      });
+  }
+
+  /** Liest alle Welten aus MM.WELTEN_LISTE (welten/liste.js). Fehlerhafte Welten werden übersprungen. */
   function laden() {
-    return ladeJson('welten/welten.json').then(function (index) {
-      return Promise.all(index.welten.map(function (id) {
-        return ladeJson('welten/' + id + '/welt.json').then(
-          function (w) {
-            w.id = id;
-            w.ordner = 'welten/' + id + '/';
-            return w;
-          },
-          function (err) {
-            console.warn('Welt „' + id + '“ konnte nicht geladen werden:', err);
-            return null;
-          }
-        );
-      }));
-    }).then(function (welten) {
+    var ids = MM.WELTEN_LISTE || [];
+    if (!ids.length) return Promise.reject(new Error('welten/liste.js fehlt oder ist leer'));
+    return Promise.all(ids.map(function (id) {
+      return ladeWeltDaten(id).catch(function (err) {
+        console.warn('Welt „' + id + '“ konnte nicht geladen werden:', err);
+        return null;
+      });
+    })).then(function (welten) {
       liste = welten.filter(Boolean);
       return liste;
     });
@@ -230,6 +251,10 @@ window.MM = window.MM || {};
     /** Wird von welten/<id>/szene.js aufgerufen. */
     register: function (id, szene) {
       szenen[id] = szene;
+    },
+    /** Wird von welten/<id>/welt.js aufgerufen. */
+    daten: function (id, inhalt) {
+      daten[id] = inhalt;
     },
     laden: laden,
     aktivieren: aktivieren,

@@ -1,4 +1,10 @@
-{
+/*
+ * Daten der Welt „Wald“: Name, Beschreibung, Farben, Items und Kreaturen.
+ * Als .js statt .json, damit die App auch ohne Webserver (Doppelklick auf index.html) läuft.
+ */
+'use strict';
+
+MM.welten.daten('wald', {
   "name": "Wald",
   "beschreibung": "Bäume, Pilze und scheue Waldtiere",
   "status": "platzhalter",
@@ -32,4 +38,4 @@
       "beschreibung": "Kommt, wenn es Bäume gibt"
     }
   ]
-}
+});

@@ -1,4 +1,10 @@
-{
+/*
+ * Daten der Welt „Strand“: Name, Beschreibung, Farben, Items und Kreaturen.
+ * Als .js statt .json, damit die App auch ohne Webserver (Doppelklick auf index.html) läuft.
+ */
+'use strict';
+
+MM.welten.daten('strand', {
   "name": "Strand",
   "beschreibung": "Krabben, Seesterne, Delfine und Möwen am Meer",
   "status": "spielbar",
@@ -60,4 +66,4 @@
       "beschreibung": "Fliegt weg, wenn es laut wird"
     }
   ]
-}
+});

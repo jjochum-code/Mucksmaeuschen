@@ -8,7 +8,7 @@ Status: **Platzhalter – wartet auf Ausbau**
 
 | Datei | Wofür |
 |---|---|
-| `welt.json` | Daten der Welt: Name, Farben, Items (kaufbar) und Kreaturen (kommen von selbst) |
+| `welt.js` | Daten der Welt: Name, Farben, Items (kaufbar) und Kreaturen (kommen von selbst) |
 | `szene.js` | Zeichnet die Welt. Hier passiert das Aussehen und die Bewegung. |
 | `vorschau.svg` | Bild für die Auswahl im Startbildschirm (160 × 100) |
 | `assets/` | Platz für eigene Bilder (z. B. Pixel-Sprites als PNG) |

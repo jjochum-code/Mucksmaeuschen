@@ -1,4 +1,10 @@
-{
+/*
+ * Daten der Welt „Wiese“: Name, Beschreibung, Farben, Items und Kreaturen.
+ * Als .js statt .json, damit die App auch ohne Webserver (Doppelklick auf index.html) läuft.
+ */
+'use strict';
+
+MM.welten.daten('wiese', {
   "name": "Wiese",
   "beschreibung": "Blumen, Gras und summende Bienen",
   "status": "platzhalter",
@@ -32,4 +38,4 @@
       "beschreibung": "Kommt, wenn Blumen blühen"
     }
   ]
-}
+});

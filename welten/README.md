@@ -16,7 +16,7 @@ Ordners anzufassen.**
 
 ```
 welten/wald/
-  welt.json      Daten: Name, Beschreibung, Farben, Items, Kreaturen
+  welt.js        Daten: Name, Beschreibung, Farben, Items, Kreaturen
   szene.js       Zeichnung und Bewegung der Welt
   vorschau.svg   Bild für die Auswahl (160 × 100)
   assets/        eigene Bilder, Sprites usw.
@@ -25,7 +25,7 @@ welten/wald/
 
 ## Loslegen
 
-1. Seite starten: `docker compose up -d`, dann http://localhost:8080 öffnen.
+1. `index.html` doppelklicken (kein Server nötig).
 2. Im Startbildschirm eure Welt wählen und „Ohne Mikrofon“ starten.
    Mit den Tasten **1–4** schaltet ihr die Ampel von „still“ bis „zu laut“ und seht,
    wie eure Welt reagiert.
@@ -62,11 +62,11 @@ Die id in `register('…')` muss genau dem Ordnernamen entsprechen.
 
 | Feld | Bedeutung |
 |---|---|
-| `env.w`, `env.h` | Größe der Welt in **Welt-Pixeln** (1 Welt-Pixel = 4 Bildschirm-Pixel → Pixel-Look; mit `"pixel"` in `welt.json` änderbar) |
+| `env.w`, `env.h` | Größe der Welt in **Welt-Pixeln** (1 Welt-Pixel = 4 Bildschirm-Pixel → Pixel-Look; mit `"pixel"` in `welt.js` änderbar) |
 | `env.ruhe` | **0 = laut … 1 = ganz ruhig**, sanft geglättet. Damit steuert ihr, wie lebendig die Welt ist. |
 | `env.stufe` | Ampelstufe 0 (still) bis 3 (zu laut) |
 | `env.t`, `env.dt` | Zeit seit Start und seit dem letzten Bild (Sekunden) – für Animationen |
-| `env.welt` | Inhalt eurer `welt.json` (z. B. `env.welt.farben.boden`) |
+| `env.welt` | Inhalt eurer `welt.js` (z. B. `env.welt.farben.boden`) |
 | `env.pixel` | Hilfsfunktionen (siehe unten) |
 
 Idee: **Ruhe belebt die Welt** (Tiere kommen heraus, Blumen öffnen sich, Sonne geht auf),
@@ -89,10 +89,15 @@ baum.src = 'welten/wald/assets/baum.png';
 // in draw():  ctx.drawImage(baum, x, y);
 ```
 
-## `welt.json`
+## `welt.js`
 
-```json
-{
+Die Daten stehen in einer `.js`-Datei (nicht `.json`), damit die App auch ohne Webserver
+per Doppelklick läuft. Der Inhalt ist ganz normales JSON, nur mit einer Zeile drumherum:
+
+```js
+'use strict';
+
+MM.welten.daten('wald', {
   "name": "Wald",
   "beschreibung": "Bäume, Pilze und scheue Waldtiere",
   "status": "platzhalter",
@@ -104,8 +109,11 @@ baum.src = 'welten/wald/assets/baum.png';
   "kreaturen": [
     { "id": "eichhoernchen", "name": "Eichhörnchen", "braucht": ["tanne"], "beschreibung": "Kommt, wenn es Bäume gibt" }
   ]
-}
+});
 ```
+
+Die id in `daten('…')` muss genau dem Ordnernamen entsprechen.
+Eine alte `welt.json` wird übrigens noch gelesen – aber nur, wenn die App über einen Webserver läuft.
 
 - `status`: `"platzhalter"` zeigt in der Auswahl „im Aufbau“, `"spielbar"` blendet das aus.
 - `pixel` (optional, 1–8, Standard 4): wie grob die Welt gemalt wird. 4 = deutlicher Pixel-Look
@@ -118,8 +126,8 @@ baum.src = 'welten/wald/assets/baum.png';
 
 1. Einen vorhandenen Ordner kopieren, z. B. `wald/` → `berge/`.
 2. In `berge/szene.js` die id ändern: `MM.welten.register('berge', …)`.
-3. `berge/welt.json` anpassen.
-4. In `welten/welten.json` die id `"berge"` in die Liste eintragen.
+3. In `berge/welt.js` die id ändern (`MM.welten.daten('berge', …)`) und die Daten anpassen.
+4. In `welten/liste.js` die id `"berge"` in die Liste eintragen.
 
 ## Regeln
 

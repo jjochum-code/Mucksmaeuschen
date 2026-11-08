@@ -1,4 +1,10 @@
-{
+/*
+ * Daten der Welt „Dschungel“: Name, Beschreibung, Farben, Items und Kreaturen.
+ * Als .js statt .json, damit die App auch ohne Webserver (Doppelklick auf index.html) läuft.
+ */
+'use strict';
+
+MM.welten.daten('dschungel', {
   "name": "Dschungel",
   "beschreibung": "Riesige Bäume, Lianen, ein Orang-Utan, ein Tukan, eine Schlange und Schmetterlinge",
   "status": "spielbar",
@@ -57,4 +63,4 @@
       "beschreibung": "Flattert umher und landet auf den Blüten"
     }
   ]
-}
+});

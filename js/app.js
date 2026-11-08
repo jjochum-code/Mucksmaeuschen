@@ -274,7 +274,7 @@
     function (err) {
       console.warn('Welten konnten nicht geladen werden:', err);
       weltAuswahl.textContent =
-        'Die Welten konnten nicht geladen werden. Bitte die Seite über den Webserver öffnen (siehe README).';
+        'Die Welten konnten nicht geladen werden (welten/liste.js fehlt?). Details in der Browser-Konsole (F12).';
       weltSelect.closest('.field').hidden = true;
     }
   );

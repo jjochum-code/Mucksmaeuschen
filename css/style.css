@@ -561,3 +561,13 @@ select:focus-visible,
   background: #ffd84a;
   color: #2b2100;
 }
+
+.herkunft {
+  margin-top: 4px;
+  font-size: 0.8rem !important;
+  opacity: 0.8;
+}
+
+.herkunft a {
+  color: inherit;
+}

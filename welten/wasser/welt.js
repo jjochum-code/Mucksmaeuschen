@@ -1,4 +1,10 @@
-{
+/*
+ * Daten der Welt „Wasser“: Name, Beschreibung, Farben, Items und Kreaturen.
+ * Als .js statt .json, damit die App auch ohne Webserver (Doppelklick auf index.html) läuft.
+ */
+'use strict';
+
+MM.welten.daten('wasser', {
   "name": "Wasser",
   "beschreibung": "Ein Unterwasser-Riff mit bunten Fischen",
   "status": "spielbar",
@@ -48,4 +54,4 @@
       "beschreibung": "Kriecht langsam über den Boden und zieht sich bei Lärm ins Haus zurück"
     }
   ]
-}
+});
