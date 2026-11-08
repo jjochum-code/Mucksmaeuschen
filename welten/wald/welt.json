@@ -1,35 +1,70 @@
 {
   "name": "Wald",
-  "beschreibung": "Bäume, Pilze und scheue Waldtiere",
-  "status": "platzhalter",
+  "beschreibung": "Eichhörnchen, Igel, Hase, Vögel und Schmetterlinge",
+  "status": "spielbar",
   "vorschau": "vorschau.svg",
   "farben": {
-    "himmel": "#a8d8ff",
-    "horizont": "#e3f3ff",
-    "boden": "#3f7d3a"
+    "himmel": "#7fcbf7",
+    "horizont": "#a9dcf9",
+    "hinten": "#6aaeb0",
+    "gras": "#7cc444",
+    "grasHell": "#9bd765",
+    "grasDunkel": "#5fa83a",
+    "blatt": "#6cc644",
+    "blattDunkel": "#2f8a3a",
+    "stamm": "#9a5b2e",
+    "stammDunkel": "#6e3f1e"
   },
   "items": [
     {
-      "id": "tanne",
-      "name": "Tanne",
-      "preis": 10,
-      "beschreibung": "Ein Nadelbaum"
+      "id": "baumstumpf",
+      "name": "Baumstumpf",
+      "preis": 8,
+      "beschreibung": "Ein Sitzplatz für Vögel"
     },
     {
-      "id": "pilzkreis",
-      "name": "Pilzkreis",
-      "preis": 15,
-      "beschreibung": "Ein Ring aus Pilzen"
+      "id": "blume",
+      "name": "Blume",
+      "preis": 6,
+      "beschreibung": "Öffnet sich, wenn es still ist"
+    },
+    {
+      "id": "fliegenpilz",
+      "name": "Fliegenpilz",
+      "preis": 5,
+      "beschreibung": "Rot mit weißen Punkten"
     }
   ],
   "kreaturen": [
     {
       "id": "eichhoernchen",
       "name": "Eichhörnchen",
-      "braucht": [
-        "tanne"
-      ],
-      "beschreibung": "Kommt, wenn es Bäume gibt"
+      "braucht": [],
+      "beschreibung": "Klettert bei Lärm auf den Baum"
+    },
+    {
+      "id": "igel",
+      "name": "Igel",
+      "braucht": [],
+      "beschreibung": "Rollt sich bei Lärm zur Kugel"
+    },
+    {
+      "id": "hase",
+      "name": "Hase",
+      "braucht": [],
+      "beschreibung": "Hoppelt bei Lärm ins Gebüsch"
+    },
+    {
+      "id": "vogel",
+      "name": "Rotkehlchen",
+      "braucht": ["baumstumpf"],
+      "beschreibung": "Singt, wenn es ruhig ist"
+    },
+    {
+      "id": "schmetterling",
+      "name": "Schmetterling",
+      "braucht": ["blume"],
+      "beschreibung": "Flattert bei Stille, ruht sich auf Blumen aus"
     }
   ]
 }
