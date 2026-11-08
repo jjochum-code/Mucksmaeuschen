@@ -10,8 +10,12 @@
   <body>
     <div id="app">
       <header class="topbar">
-        <h1 class="brand">Mucksmäuschen</h1>
+        <h1 class="brand"><img class="brand-logo" src="img/logo.webp" alt="Mucksmäuschen" /></h1>
         <div class="controls">
+          <label class="field">
+            <span>Welt</span>
+            <select id="welt"></select>
+          </label>
           <label class="field">
             <span>Phase</span>
             <select id="phase"></select>
@@ -35,15 +39,23 @@
           <div class="zones zones-lit" id="zones-lit"></div>
         </div>
 
-        <ol class="legend" id="legend" aria-label="Stufen"></ol>
-        <p class="status" id="status" role="status"></p>
-        <pre class="debug" id="debug" hidden></pre>
+        <!-- unten: Stufen-Leiste (im Handbetrieb zum Antippen), Status, Messwerte -->
+        <div class="hud hud-unten">
+          <ol class="legend" id="legend" aria-label="Stufen"></ol>
+          <p class="status" id="status" role="status"></p>
+          <pre class="debug" id="debug" hidden></pre>
+        </div>
       </main>
 
       <section class="overlay" id="start-screen">
         <div class="card">
-          <h2>Mucksmäuschen</h2>
-          <p>Die Klasse sieht, wie laut es gerade ist – in vier Farbstufen.</p>
+          <h2><img class="card-logo" src="img/logo.webp" alt="Mucksmäuschen" /></h2>
+          <p>Ist die Klasse ruhig, wird die Welt lebendig. Wird es laut, zieht sie sich zurück.</p>
+
+          <h3 class="card-step">1. Welt wählen</h3>
+          <div class="welt-auswahl" id="welt-auswahl" role="radiogroup" aria-label="Spielwelt"></div>
+
+          <h3 class="card-step">2. Starten</h3>
           <div class="card-actions">
             <button id="start-mic" type="button" class="btn btn-primary">Mikrofon starten</button>
             <button id="start-manual" type="button" class="btn">Ohne Mikrofon (von Hand steuern)</button>

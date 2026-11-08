@@ -1,0 +1,10 @@
+{
+  "_hinweis": "Reihenfolge = Reihenfolge in der Auswahl. Neue Welt: Ordner anlegen und id hier eintragen.",
+  "welten": [
+    "wald",
+    "wiese",
+    "wasser",
+    "strand",
+    "dschungel"
+  ]
+}

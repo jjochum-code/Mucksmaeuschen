@@ -1,0 +1,35 @@
+{
+  "name": "Dschungel",
+  "beschreibung": "Riesige Blätter, Lianen und bunte Vögel",
+  "status": "platzhalter",
+  "vorschau": "vorschau.svg",
+  "farben": {
+    "himmel": "#8fd6b0",
+    "horizont": "#d9f5c8",
+    "boden": "#2f6b2a"
+  },
+  "items": [
+    {
+      "id": "liane",
+      "name": "Liane",
+      "preis": 9,
+      "beschreibung": "Zum Schwingen"
+    },
+    {
+      "id": "riesenblatt",
+      "name": "Riesenblatt",
+      "preis": 14,
+      "beschreibung": "Ein Blatt so groß wie ein Schirm"
+    }
+  ],
+  "kreaturen": [
+    {
+      "id": "papagei",
+      "name": "Papagei",
+      "braucht": [
+        "liane"
+      ],
+      "beschreibung": "Landet auf den Lianen"
+    }
+  ]
+}
