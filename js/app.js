@@ -322,6 +322,8 @@
       setLevel(st.fastRel);
       showDebug(t, db, st);
     }
+    // Belohnungen (Sternenwiese): zählt ruhige Zeit im Mikrofon- und im Handbetrieb
+    if (MM.belohnung) MM.belohnung.tick(t, dt, currentStage, mode === 'live' || mode === 'manual');
     rafId = requestAnimationFrame(loop);
   }
 
@@ -390,6 +392,10 @@
     statusEl.textContent = 'Von Hand: Stufe antippen oder Tasten 1–4 drücken.';
     setStage(0);
     keepAwake();
+    // Messschleife auch im Handbetrieb laufen lassen – für die Belohnungen
+    cancelAnimationFrame(rafId);
+    lastT = 0;
+    rafId = requestAnimationFrame(loop);
   });
 
   // ---------- Bedienelemente ----------

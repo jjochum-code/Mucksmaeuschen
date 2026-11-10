@@ -571,3 +571,266 @@ select:focus-visible,
 .herkunft a {
   color: inherit;
 }
+
+/* ---------- Belohnungen: Sternenwiese (von Vera, Branch „Belohnungssystem“) ---------- */
+.star-badge {
+  margin-left: 4px;
+  color: #815d00;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.rewards-overlay {
+  z-index: 12;
+}
+
+.rewards-card {
+  width: min(920px, 100%);
+  max-height: min(92dvh, 960px);
+  overflow-y: auto;
+  text-align: left;
+  padding: clamp(18px, 3vw, 32px);
+}
+
+.rewards-heading,
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rewards-heading h2,
+.section-heading h3 {
+  margin: 0;
+}
+
+.rewards-heading h2 {
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+}
+
+.card .eyebrow {
+  margin: 0 0 4px;
+  color: #52705a;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.close-rewards {
+  min-width: 44px;
+  padding: 8px;
+  font-size: 1.15rem;
+}
+
+.reward-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 18px 0;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #fff7d6;
+}
+
+.star-count {
+  color: #765500;
+  font-size: 1.35rem;
+  white-space: nowrap;
+}
+
+.reward-message {
+  flex: 1;
+  min-width: 220px;
+  margin: 0;
+  color: #4a4634;
+}
+
+.meadow-section,
+.animals-section {
+  margin-top: 20px;
+}
+
+.section-heading h3 {
+  font-size: 1.25rem;
+}
+
+.section-heading p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.quiet-timer {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #eef6e9;
+  color: #315d36;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.meadow {
+  min-height: 132px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: end;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 12px 12px 8px;
+  overflow: hidden;
+  border: 2px solid #d5e8c9;
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 18% 100%, #92c96d 0 25%, transparent 26%),
+    radial-gradient(ellipse at 76% 105%, #a5d27a 0 30%, transparent 31%),
+    linear-gradient(#e9f8ff 0 53%, #c4e6a5 54% 100%);
+}
+
+.flower {
+  display: grid;
+  min-height: 48px;
+  place-items: end center;
+  font-size: clamp(1.25rem, 4vw, 2.1rem);
+  opacity: 0.5;
+  transform: translateY(3px) scale(0.82);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 1.4, 0.5, 1);
+}
+
+.flower.grown {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.reward-progress {
+  height: 12px;
+  margin-top: 10px;
+}
+
+.reward-progress .progress-fill {
+  background: linear-gradient(90deg, #70b956, #f1c644);
+}
+
+.card .meadow-note {
+  margin: 9px 0 0;
+  color: #59645b;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.animal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.animal-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 12px;
+  border: 2px solid #e5e9e1;
+  border-radius: 16px;
+  background: #fbfcfa;
+}
+
+.animal-card.unlocked {
+  border-color: #9dc98b;
+  background: #f1f8ed;
+}
+
+.animal-icon {
+  grid-row: span 2;
+  font-size: 2rem;
+}
+
+.animal-details h4,
+.animal-details p {
+  margin: 0;
+}
+
+.animal-details h4 {
+  font-size: 1rem;
+}
+
+.animal-details p {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.animal-unlock {
+  grid-column: 1 / -1;
+  min-height: 40px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.animal-unlock:not(:disabled) {
+  border-color: #438d48;
+  background: #438d48;
+  color: #fff;
+}
+
+.animal-unlock:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.animal-unlock:focus-visible,
+.close-rewards:focus-visible {
+  outline: 3px solid #1d2327;
+  outline-offset: 2px;
+}
+
+@media (max-width: 620px) {
+  .animal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .animal-card {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .animal-icon {
+    grid-row: 1;
+  }
+
+  .animal-unlock {
+    grid-column: 3;
+    grid-row: 1;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .rewards-heading,
+  .section-heading {
+    align-items: flex-start;
+  }
+
+  .section-heading {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .quiet-timer {
+    align-self: flex-start;
+  }
+
+  .animal-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .animal-unlock {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    margin-top: 4px;
+  }
+}

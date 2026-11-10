@@ -31,13 +31,17 @@ belebt – und später ihr eigenes **Klassentier** (z. B. die „Affenklasse“)
 - [x] **Dschungel** – Orang-Utan an Lianen (klettern, pendeln, hangeln), Tukan, Schlange,
       Schmetterlinge; Bild-Ebenen mit Animationsbildern
 - [x] **Strand** – Krabben, Seesterne, Delfine, Möwen (Team)
-- [ ] **Wald** – liegt im Branch `welt-wald`, noch nicht zusammengeführt
+- [x] **Wald** – Eichhörnchen, Igel, Hase, Vögel und Schmetterlinge (Team)
 - [ ] **Wiese** – Platzhalter
 
 **Technik**
 - [x] Reines HTML/CSS/JavaScript, startet per Doppelklick ohne Server
 - [x] Optional nginx (Docker) mit Sicherheits-Headern
 - [x] Logo, Icon, Hinweis auf den Saar Hackathon
+
+**Belohnungen (erster Baustein für Milestone 2)**
+- [x] **Sternenwiese** (Vera): jede Minute „Mucksmäuschenstill“ = 1 Stern + 1 Blume,
+      Tiere (Hase, Fuchs, Eule) mit Sternen freischalten, Stand im Browser gespeichert
 
 ---
 
@@ -65,7 +69,9 @@ Kern: **Ruhe-Blöcke → Punkte → Itemstore → die Welt wird lebendiger.**
    (Blüten → Schmetterlinge).
 
 ### Vorbereitung (vor dem Hackathon)
-- [ ] Branch `welt-wald` zusammenführen (Weltdaten auf `welt.js` umstellen), Wiese ausbauen
+- [ ] Wiese ausbauen
+- [ ] Sternenwiese mit dem Itemstore verbinden: Sterne = Punkte, die freigeschalteten Tiere
+      erscheinen in der Welt der Klasse (statt als Emoji im Fenster)
 - [ ] Mit echtem Mikrofon in einer Klasse testen, Standard-Schwellen anpassen
 - [ ] Je Welt festlegen: **Starttier**, kaufbare Pflanzen/Items mit Preisen, freischaltbare Tiere
       mit Bedingung (`braucht`) – z. B. Dschungel: Start mit Schlange; Blüten → Schmetterlinge,

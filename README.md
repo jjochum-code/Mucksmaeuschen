@@ -30,8 +30,11 @@ bei jedem Start nach dem Mikrofon.
   - **Wasser** – Pixel-Fische (nach [Pixelquarium](https://github.com/jjochum-code/Pixelquarium)), Krebse, Schnecken
   - **Dschungel** – Orang-Utan an den Lianen, Tukan, Schlange, Schmetterlinge
   - **Strand** – Krabben, Seesterne, Delfine, Möwen
-  - **Wald**, **Wiese** – im Aufbau
+  - **Wald** – Eichhörnchen, Igel, Hase, Vögel und Schmetterlinge
+  - **Wiese** – im Aufbau
 - Handbetrieb ohne Mikrofon (Stufe antippen oder Tasten 1–4), Vollbild, Bildschirm bleibt an
+- **Sternenwiese** (Belohnungen, von Vera): jede Minute „Mucksmäuschenstill“ bringt einen
+  Stern und lässt eine Blume wachsen; mit Sternen werden Tiere freigeschaltet
 - Messwerte zum Einstellen: Taste **D** oder `?debug` in der Adresse
 
 ## Aufbau
@@ -45,6 +48,7 @@ js/config.js         Stufen, Phasen, Grenzwerte (Daten)
 js/loudness.js       Glättung und Stufenlogik
 js/mic.js            Mikrofon → Pegel (Web Audio)
 js/welten.js         lädt und zeigt die Spielwelten
+js/belohnung.js      Belohnungen: Sternenwiese (Sterne, Blumen, Tiere freischalten)
 js/app.js            Oberfläche und Ablauf
 img/                 Logo und Icons
 welten/liste.js      welche Welten es gibt (Reihenfolge der Auswahl)
