@@ -142,6 +142,7 @@
     );
     // Platz bleibt reserviert, damit der Pegelmesser beim Ein-/Ausblenden nicht springt
     sensReset.style.visibility = isDefault ? 'hidden' : 'visible';
+    if (mode === 'manual') zeigeHandPegel(); // Regler verschoben → Pegel neu einordnen
   }
 
   function setRed(v) {
@@ -159,7 +160,6 @@
   var drag = null; // { y: Start-Y, red: Startwert, dbPerPx }
 
   sensHandle.addEventListener('pointerdown', function (e) {
-    if (mode === 'manual') return;
     e.preventDefault();
     var barHeight = meterBar.getBoundingClientRect().height;
     drag = {
@@ -209,6 +209,14 @@
     var chips = legend.querySelectorAll('.chip');
     for (var k = 0; k < chips.length; k++) chips[k].classList.toggle('active', k === i);
     MM.welten.setStufe(i);
+    if (mode === 'manual') zeigeHandPegel();
+  }
+
+  /** Handbetrieb: Es gibt keinen Messwert – der Pegelmesser zeigt die Mitte der gewählten Stufe. */
+  function zeigeHandPegel() {
+    if (currentStage < 0) return;
+    var b = [cfg.METER_RANGE.min].concat(thresholds(), [cfg.METER_RANGE.max]);
+    setLevel((b[currentStage] + b[currentStage + 1]) / 2);
   }
 
   function setLevel(fastRel) {
@@ -388,9 +396,9 @@
     startScreen.hidden = true;
     app.classList.add('manual');
     btnRecalibrate.hidden = true;
-    zonesLit.style.clipPath = 'inset(100% 0 0 0)';
     statusEl.textContent = 'Von Hand: Stufe antippen oder Tasten 1–4 drücken.';
     setStage(0);
+    zeigeHandPegel(); // Pegelmesser und Regler bleiben auch ohne Mikrofon sichtbar
     keepAwake();
     // Messschleife auch im Handbetrieb laufen lassen – für die Belohnungen
     cancelAnimationFrame(rafId);

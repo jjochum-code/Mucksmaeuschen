@@ -319,13 +319,6 @@ select:focus-visible,
   cursor: pointer;
 }
 
-.manual .meter-wrap {
-  display: none;
-}
-
-.manual .hud-rechts {
-  padding: 8px;
-}
 
 .legend {
   list-style: none;
